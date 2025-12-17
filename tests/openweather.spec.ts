@@ -55,3 +55,18 @@ test('call API for Lisbon', async ({ request }) => {
   expect(body.name).toBe('Lisbon');
   expect(body.main).toHaveProperty('temp');
 })
+
+test('Invalid city name', async ({ request }) =>{
+  if (!apiKey) throw new Error('Api key is not set');
+
+  const response = await request.get(`${BASE_URL}/weather`, {
+    params: {appid: apiKey, q: 'InvalidCityName'}
+  });
+
+  expect(response.status()).toBe(404);
+
+  const body = await response.json();
+  console.log('Error response', body);
+  
+  expect(body.message).toContain('city not found');
+});

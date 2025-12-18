@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import dotenv from 'dotenv';
+import { log } from 'node:console';
+import { parseArgs } from 'node:util';
 
 dotenv.config();
 
@@ -66,7 +68,23 @@ test('Invalid city name', async ({ request }) =>{
   expect(response.status()).toBe(404);
 
   const body = await response.json();
-  console.log('Error response', body);
+  console.log('Error response:', body);
   
   expect(body.message).toContain('city not found');
+});
+
+test('XMl format works', async ({  request }) => {
+  if (!apiKey) throw new Error('shit aint workinf sherlock');
+
+  const response = await request.get(`${BASE_URL}/weather`, {
+    params: {appid: apiKey, q: 'Oslo', units: 'metric', mode: 'xml'}
+  });
+
+  expect(response.status()).toBe(200);
+
+  const body = await response.text();
+  console.log('XML response for Oslo', body);
+
+  expect(body).toContain('<?xml');
+  expect(body).toContain('<city');
 });
